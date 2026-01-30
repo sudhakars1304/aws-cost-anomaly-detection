@@ -5,20 +5,8 @@ import os
 
 logging.basicConfig(level=logging.INFO)
 
-def extract_flattened_anomalies(json_data):
-    """Yields a dictionary per anomaly, with essential fields."""
-    # Example assumes AWS CostAnomaly payload shape; adapt if needed.
-    anomalies = json_data.get("anomalies", [json_data])
-    for anomaly in anomalies:
-        yield {
-            "accountId": anomaly.get("accountId"),
-            "accountName": anomaly.get("accountName"),
-            "region": anomaly.get("rootCauses", {}).get("region"),
-            "service": anomaly.get("rootCauses", {}).get("service"),
-            "usageType": anomaly.get("rootCauses", {}).get("usageType"),
-            "impact": anomaly.get("impact", {}),
-            "anomalyDetailsLink": anomaly.get("anomalyDetailsLink"),
-        }
+def flattened_anomaly(json_data):
+    return json_data
 
 def post_to_webhook(data):
     try:
@@ -43,8 +31,8 @@ def lambda_handler(event, context):
             sns_message = record['Sns']['Message']
             if isinstance(sns_message, str):
                 sns_message = json.loads(sns_message)
-            for anomaly_data in extract_flattened_anomalies(sns_message):
-                post_to_webhook(anomaly_data)
+            flattened_data = flattened_anomaly(sns_message)
+            post_to_webhook(flattened_data)
     except Exception as e:
         logging.error(f'Error processing SNS message: {e}')
         raise e
