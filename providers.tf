@@ -11,6 +11,6 @@
 #  }
 #}
 
-provider "aws" {
-  region = "ap-east-1" # Cost Explorer requires ap-east-1
-}
+#provider "aws" {
+#  region = "ap-east-1" # Cost Explorer requires ap-east-1
+#}
